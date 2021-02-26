@@ -1,0 +1,30 @@
+<ul>
+    <li> Access Token: {{ spotifyuser.access_token|default_if_none:"Not logged in" }}</li>
+    <li> Refresh Token: {{ spotifyuser.refresh_token|default_if_none:"Not logged in" }}</li>
+    <li> Scope: {{ spotifyuser.scope|default_if_none:"Not logged in" }}</li>
+</ul>
+
+<form action="music/spotifyLogin/" method="post">
+    {% csrf_token %}                                                                                                                                                                           
+    <input type="submit" value="Spotify authenticate">
+</form>
+
+<form action="startApp" method="post">
+    {% csrf_token %}                                                                                                                                                                           
+    <input type="submit" value="Start">
+</form>
+
+<form action="stopApp" method="post">
+    {% csrf_token %}                                                                                                                                                                           
+    <input type="submit" value="Stop">
+</form>
+
+<form action="getDevices" method="post">
+    {% csrf_token %}                                                                                                                                                                           
+    <input type="submit" value="Get Devices">
+</form>
+
+<form action="getPlaylist" method="post">
+    {% csrf_token %}                                                                                                                                                                           
+    <input type="submit" value="Get Playlist">
+</form>

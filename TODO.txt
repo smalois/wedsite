@@ -1,0 +1,1 @@
+- Create the nowPlaying html and context 

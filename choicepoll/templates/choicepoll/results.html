@@ -1,0 +1,6 @@
+<h1>Results:</h1>
+<ul>
+    {% for choice in choices %}
+    <li> {{choice.votes}}: {{ choice.song.name }}</li>
+    {% endfor %}
+</ul>

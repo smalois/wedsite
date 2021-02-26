@@ -1,0 +1,5 @@
+<h1> Welcome {{ user.username|default_if_none:"Anonymous" }} </h1>
+<h2> Here are the other parts of this website: </h2>
+<li> <a href="{% url 'vote-index' %}">Vote</a> </li>
+<li> <a href="{% url 'results' %}">Current Results</a> </li>
+<li> <a href="{% url 'music-playing' %}">Current Music</a> </li>
