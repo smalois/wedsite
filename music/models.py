@@ -23,8 +23,8 @@ class Device(models.Model):
         return self.name
 
 class SpotifyUser(models.Model):
-    access_token = models.CharField(max_length=128)
-    refresh_token = models.CharField(max_length=128, default="")
+    access_token = models.CharField(max_length=255)
+    refresh_token = models.CharField(max_length=255, default="")
     expiration_date = models.DateTimeField(default=timezone.now)
     scope = models.CharField(max_length=256)
 
