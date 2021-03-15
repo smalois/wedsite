@@ -18,8 +18,9 @@ class PlayStatus(models.Model):
     def refreshChoices(self):
         items = Song.objects.all()
         random_items = random.sample(list(items), 4)
-        for i in range(0,4):
-            newChoice = Choice(pk=i, song=random_items[i], choice_text=random_items[i].name)
+        # MySQL doesn't like 0 index
+        for i in range(1,5):
+            newChoice = Choice(pk=i, song=random_items[i - 1], choice_text=random_items[i - 1].name)
             newChoice.save()
 
     def startVoteLoop(self):
