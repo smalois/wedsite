@@ -23,8 +23,8 @@ class Device(models.Model):
         return self.name
 
 class SpotifyUser(models.Model):
-    access_token = models.CharField(max_length=255)
-    refresh_token = models.CharField(max_length=255, default="")
+    access_token = models.TextField(max_length=512)
+    refresh_token = models.TextField(max_length=512, default="")
     expiration_date = models.DateTimeField(default=timezone.now)
     scope = models.CharField(max_length=256)
 
@@ -35,6 +35,23 @@ class SpotifyUser(models.Model):
         print("Playing: " + songId)
         # response = requests.put(music.ENDPOINT_PLAYSONG, headers=header, json=data)
 
+    # UNTESTED
+    def enqueueSong(self, songId):
+        self.optionallyRefreshToken()
+        header = {"Authorization": "Bearer " + self.access_token, "Accept": "application/json", "Content-Type": "application/json"}
+        data = { "uris" : [music.PLAYSONG_URI + songId]}
+        print("Adding song to queue: " + songId)
+        #response = requests.post(music.ENDPOINT_ENQUEUE, headers=header, json=data)
+
+    def stopSong(self):
+        self.optionallyRefreshToken()
+        header = {"Authorization": "Bearer " + self.access_token, "Accept": "application/json", "Content-Type": "application/json"}
+        print("Stopping")
+        # response = requests.put(music.ENDPOINT_STOP, headers=header)
+        # if (response.ok):
+        #     print("Successfully stopped playing music")
+        # else: 
+        #     print("Failed to stop the music")
 
     def getDevices(self):
         self.optionallyRefreshToken()
@@ -81,7 +98,6 @@ class SpotifyUser(models.Model):
 
                 playerAccount = SpotifyUser(id=1, access_token=access_token, refresh_token=self.refresh_token, scope=scope)
                 playerAccount.save()
-
 
 
     def __str__(self):
