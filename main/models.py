@@ -14,7 +14,7 @@ import multiprocessing
 import os
 import signal
 
-VOTE_TRANSITION_SECONDS = 10
+VOTE_TRANSITION_SECONDS = 30
 CROSSFADE_LENGTH_SECONDS = 5
 THREAD_POLL_RATE_SECONDS = .5
 
@@ -29,6 +29,7 @@ class PlayStatus(models.Model):
         # MySQL doesn't like 0 index
         for i in range(1,5):
             newChoice = Choice(pk=i, song=random_items[i - 1], choice_text=random_items[i - 1].name)
+            newChoice.voteEnabled = True
             newChoice.save()
 
     def startVoteLoop(self):
@@ -38,6 +39,7 @@ class PlayStatus(models.Model):
 
         currentStatus.votingProcess = pid
         currentStatus.refreshChoices()
+        currentStatus.save()
 
         # Select the song to play
         highestVoteCount = Choice.objects.aggregate(Max('votes'))
@@ -52,7 +54,7 @@ class PlayStatus(models.Model):
 
         while (True):
             songEndTime = timezone.now() + timezone.timedelta(seconds=winningChoice.song.length / 1000)
-            voteEndTime = songEndTime - timezone.timedelta(seconds=VOTE_TRANSITION_SECONDS)
+            voteEndTime = songEndTime - timezone.timedelta(seconds=VOTE_TRANSITION_SECONDS) # TODO This could be 0
             print("Waiting for voting to end...", end="")
             while (timezone.now() < voteEndTime):
                 print(".", end="", flush=True)
@@ -64,8 +66,9 @@ class PlayStatus(models.Model):
             spotifyUser.enqueueSong(winningChoice.song.song_id)
 
             # Stop the voting here
+            Choice.objects.all().update(voteEnabled=False)
 
-            print("Voting finished, waiting for song to end...", end="")
+            print("\nVoting finished, waiting for song to end...", end="")
             while (timezone.now() < songEndTime):
                 print(".", end="")
                 time.sleep(THREAD_POLL_RATE_SECONDS)

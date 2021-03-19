@@ -26,8 +26,9 @@ def results(request):
 def vote(request):
     if (not (request.user.guest.hasVoted)):
         selected_choice = Choice.objects.get(pk=request.POST['choice'])
-        selected_choice.votes += 1
-        request.user.guest.hasVoted = True
-        selected_choice.save()
-        request.user.guest.save()
+        if (selected_choice.voteEnabled):
+            selected_choice.votes += 1
+            request.user.guest.hasVoted = True
+            selected_choice.save()
+            request.user.guest.save()
     return HttpResponseRedirect(reverse('results'))

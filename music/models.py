@@ -33,25 +33,29 @@ class SpotifyUser(models.Model):
         header = {"Authorization": "Bearer " + self.access_token, "Accept": "application/json", "Content-Type": "application/json"}
         data = { "uris" : [music.PLAYSONG_URI + songId]}
         print("Playing: " + songId)
-        # response = requests.put(music.ENDPOINT_PLAYSONG, headers=header, json=data)
+        response = requests.put(music.ENDPOINT_PLAYSONG, headers=header, json=data)
 
     # UNTESTED
     def enqueueSong(self, songId):
         self.optionallyRefreshToken()
         header = {"Authorization": "Bearer " + self.access_token, "Accept": "application/json", "Content-Type": "application/json"}
-        data = { "uris" : [music.PLAYSONG_URI + songId]}
-        print("Adding song to queue: " + songId)
-        #response = requests.post(music.ENDPOINT_ENQUEUE, headers=header, json=data)
+        data = {"uri" : [music.PLAYSONG_URI + songId]}
+        response = requests.post(music.ENDPOINT_ENQUEUE, headers=header, params=data)
+        if (response.ok):
+            print("Adding song to queue: " + songId)
+        else:
+            print("failed")
+            print(response.text)
 
     def stopSong(self):
         self.optionallyRefreshToken()
         header = {"Authorization": "Bearer " + self.access_token, "Accept": "application/json", "Content-Type": "application/json"}
         print("Stopping")
-        # response = requests.put(music.ENDPOINT_STOP, headers=header)
-        # if (response.ok):
-        #     print("Successfully stopped playing music")
-        # else: 
-        #     print("Failed to stop the music")
+        response = requests.put(music.ENDPOINT_STOP, headers=header)
+        if (response.ok):
+            print("Successfully stopped playing music")
+        else: 
+            print("Failed to stop the music")
 
     def getDevices(self):
         self.optionallyRefreshToken()
@@ -78,7 +82,6 @@ class SpotifyUser(models.Model):
         if (response.ok):
             for track in jsonResponse["tracks"]["items"]:
                 new_song = Song(song_id=track['track']['id'], 
-                                #artist_name=track['track']['artists'][0]['name'], 
                                 name=track['track']['name'], 
                                 length=track['track']['duration_ms'])
                 new_song.save()
