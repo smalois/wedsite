@@ -24,7 +24,10 @@ class PlayStatus(models.Model):
     #currentSong = models.ForeignKey("music.Song", on_delete=models.CASCADE)
 
     def refreshChoices(self):
-        items = Song.objects.all()
+        items = Song.objects.filter(has_been_played=False)
+        if (len(items) <= 4):
+            Song.resetPlayedStatus()
+            items = Song.objects.filter(has_been_played=False)
         random_items = random.sample(list(items), 4)
         # MySQL doesn't like 0 index
         for i in range(1,5):
