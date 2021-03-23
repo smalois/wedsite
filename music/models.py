@@ -23,8 +23,8 @@ class Device(models.Model):
         return self.name
 
 class SpotifyUser(models.Model):
-    access_token = models.CharField(max_length=255)
-    refresh_token = models.CharField(max_length=255, default="")
+    access_token = models.TextField(max_length=512)
+    refresh_token = models.TextField(max_length=512, default="")
     expiration_date = models.DateTimeField(default=timezone.now)
     scope = models.CharField(max_length=256)
 
@@ -32,8 +32,8 @@ class SpotifyUser(models.Model):
         self.optionallyRefreshToken()
         header = {"Authorization": "Bearer " + self.access_token, "Accept": "application/json", "Content-Type": "application/json"}
         data = { "uris" : [music.PLAYSONG_URI + songId]}
-        print("Playing: " + songId)
-        # response = requests.put(music.ENDPOINT_PLAYSONG, headers=header, json=data)
+        # print("Playing: " + songId)
+        response = requests.put(music.ENDPOINT_PLAYSONG, headers=header, json=data)
 
 
     def getDevices(self):
