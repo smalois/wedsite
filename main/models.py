@@ -4,48 +4,94 @@ from guest.models import Guest
 from music.models import Song, SpotifyUser
 from choicepoll.models import Choice
 from django.db.models import Max
+from django.utils import timezone
 
 import random
 import subprocess
 import time
 
-import threading
+import multiprocessing
+import os
+import signal
+
+VOTE_TRANSITION_SECONDS = 30
+CROSSFADE_LENGTH_SECONDS = 5
+THREAD_POLL_RATE_SECONDS = .5
 
 class PlayStatus(models.Model):
     isPlaying = models.BooleanField(default=False)
+    votingProcess = models.IntegerField(default=-1)
     #currentSong = models.ForeignKey("music.Song", on_delete=models.CASCADE)
 
     def refreshChoices(self):
-        items = Song.objects.all()
+        items = Song.objects.filter(has_been_played=False)
+        if (len(items) <= 4):
+            Song.resetPlayedStatus()
+            items = Song.objects.filter(has_been_played=False)
         random_items = random.sample(list(items), 4)
         # MySQL doesn't like 0 index
         for i in range(1,5):
             newChoice = Choice(pk=i, song=random_items[i - 1], choice_text=random_items[i - 1].name)
+            newChoice.voteEnabled = True
             newChoice.save()
 
     def startVoteLoop(self):
-        self.refreshChoices()
+        pid = os.getpid()
+        currentStatus = PlayStatus.objects.get(pk=1)
+        spotifyUser = SpotifyUser.objects.get(pk=1)
+
+        currentStatus.votingProcess = pid
+        currentStatus.refreshChoices()
+        currentStatus.save()
+
+        # Select the song to play
+        highestVoteCount = Choice.objects.aggregate(Max('votes'))
+        winningChoice = Choice.objects.filter(votes=highestVoteCount['votes__max'])[0]
+
+        # Play the song
+        spotifyUser.playSong(winningChoice.song.song_id)
+        currentStatus.refreshChoices()
+
+        # Reset all guest vote status
         Guest.objects.all().update(hasVoted=False)
-        while (self.isPlaying):
+
+        while (True):
+            songEndTime = timezone.now() + timezone.timedelta(seconds=winningChoice.song.length / 1000)
+            voteEndTime = songEndTime - timezone.timedelta(seconds=VOTE_TRANSITION_SECONDS) # TODO This could be 0
+            print("Waiting for voting to end...", end="")
+            while (timezone.now() < voteEndTime):
+                print(".", end="", flush=True)
+                time.sleep(THREAD_POLL_RATE_SECONDS)
+
+            # Select the song to play
             highestVoteCount = Choice.objects.aggregate(Max('votes'))
             winningChoice = Choice.objects.filter(votes=highestVoteCount['votes__max'])[0]
-            spotifyUser = SpotifyUser.objects.get(pk=1)
+            spotifyUser.enqueueSong(winningChoice.song.song_id)
 
-            spotifyUser.playSong(winningChoice.song.song_id)
-            self.refreshChoices()
+            # Stop the voting here
+            Choice.objects.all().update(voteEnabled=False)
+
+            print("\nVoting finished, waiting for song to end...", end="")
+            while (timezone.now() < songEndTime):
+                print(".", end="")
+                time.sleep(THREAD_POLL_RATE_SECONDS)
+
+            currentStatus.refreshChoices()
             Guest.objects.all().update(hasVoted=False)
-            time.sleep(winningChoice.song.length / 1000)
+            # Restart the voting here
 
     def startVotingThread(self):
-        if (not self.isPlaying):
-            votingThread = threading.Thread(target=self.startVoteLoop, daemon=True)
-            print("Thread starting")
-            votingThread.start()
-            self.isPlaying = True
-            self.save()
+        p = multiprocessing.Process(target=self.startVoteLoop)
+        self.isPlaying = True
+        p.start()
+        self.save()
 
     def stopVotingThread(self):
-        if (self.isPlaying):
-            print("Thread stopped")
-        self.isPlaying = False
-        self.save()
+        currentStatus = PlayStatus.objects.get(pk=1)
+        if (currentStatus.votingProcess != -1):
+            spotifyUser = SpotifyUser.objects.get(pk=1)
+            spotifyUser.stopSong()
+            os.kill(currentStatus.votingProcess, signal.SIGTERM)
+        currentStatus.isPlaying = False
+        currentStatus.votingProcess = -1
+        currentStatus.save()

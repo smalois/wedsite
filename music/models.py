@@ -12,6 +12,9 @@ class Song(models.Model):
     length = models.IntegerField()
     has_been_played = models.BooleanField(default=False)
 
+    def resetPlayedStatus():
+        Song.objects.all().update(has_been_played=False)
+
     def __str__(self):
         return self.name
 
@@ -32,9 +35,37 @@ class SpotifyUser(models.Model):
         self.optionallyRefreshToken()
         header = {"Authorization": "Bearer " + self.access_token, "Accept": "application/json", "Content-Type": "application/json"}
         data = { "uris" : [music.PLAYSONG_URI + songId]}
-        # print("Playing: " + songId)
-        response = requests.put(music.ENDPOINT_PLAYSONG, headers=header, json=data)
+        print("Playing: " + songId)
+        song = Song.objects.get(song_id=songId)
+        song.has_been_played = True
+        song.save()
+        # response = requests.put(music.ENDPOINT_PLAYSONG, headers=header, json=data)
+        # if (response.ok): 
+        #     song = Song.objects.get(song_id)
+        #     song.has_been_played = True
+        #     song.save()
 
+    # UNTESTED
+    def enqueueSong(self, songId):
+        self.optionallyRefreshToken()
+        header = {"Authorization": "Bearer " + self.access_token, "Accept": "application/json", "Content-Type": "application/json"}
+        data = {"uri" : [music.PLAYSONG_URI + songId]}
+        # response = requests.post(music.ENDPOINT_ENQUEUE, headers=header, params=data)
+        # if (response.ok):
+        #     print("Adding song to queue: " + songId)
+        # else:
+        #     print("failed")
+        #     print(response.text)
+
+    def stopSong(self):
+        self.optionallyRefreshToken()
+        header = {"Authorization": "Bearer " + self.access_token, "Accept": "application/json", "Content-Type": "application/json"}
+        print("Stopping")
+        response = requests.put(music.ENDPOINT_STOP, headers=header)
+        if (response.ok):
+            print("Successfully stopped playing music")
+        else: 
+            print("Failed to stop the music")
 
     def getDevices(self):
         self.optionallyRefreshToken()
@@ -61,7 +92,6 @@ class SpotifyUser(models.Model):
         if (response.ok):
             for track in jsonResponse["tracks"]["items"]:
                 new_song = Song(song_id=track['track']['id'], 
-                                #artist_name=track['track']['artists'][0]['name'], 
                                 name=track['track']['name'], 
                                 length=track['track']['duration_ms'])
                 new_song.save()
@@ -81,7 +111,6 @@ class SpotifyUser(models.Model):
 
                 playerAccount = SpotifyUser(id=1, access_token=access_token, refresh_token=self.refresh_token, scope=scope)
                 playerAccount.save()
-
 
 
     def __str__(self):
