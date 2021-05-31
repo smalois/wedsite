@@ -1,5 +1,23 @@
-<h1> Welcome {{ user.username|default_if_none:"Anonymous" }} </h1>
-<h2> Here are the other parts of this website: </h2>
-<li> <a href="{% url 'vote-index' %}">Vote</a> </li>
-<li> <a href="{% url 'results' %}">Current Results</a> </li>
-<li> <a href="{% url 'music-playing' %}">Current Music</a> </li>
+{% load static %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'guest/style.css' %}">
+
+<div class="header">
+<h1> Welcome to the wedding party website! </h1>
+</div>
+
+<div class="navbar">
+    <a href="{% url 'main-index' %}" class="active">Home</a>
+    <a href="{% url 'vote-index' %}">Vote</a>
+    <a href="{% url 'results' %}">Results</a>
+    <a href="{% url 'music-playing' %}">Playing</a>
+</div>
+
+<div class="main">
+    <h2> Logged in as {{ user.username|default_if_none:"Anonymous" }} </h2>
+    <h5>Thanks for coming!</h5>
+    <p>Our website lets you vote on what song plays next. Each time a new
+    song plays, you can start voting for the next song to play.
+    <p>Select the 'Vote' tab to get started.</p>
+    <br>
+</div>

@@ -1,1 +1,16 @@
-<head>NOW PLAYING</head>
+{% load static %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'guest/style.css' %}">
+
+<div class="header">
+<h1> Welcome to the wedding party website! </h1>
+</div>
+
+<div class="navbar">
+    <a href="{% url 'main-index' %}">Home</a>
+    <a href="{% url 'vote-index' %}">Vote</a>
+    <a href="{% url 'results' %}">Results</a>
+    <a href="{% url 'music-playing' %}" class="active">Playing</a>
+</div>
+
+<h1>NOW PLAYING</h1>
