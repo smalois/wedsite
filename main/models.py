@@ -88,10 +88,18 @@ class PlayStatus(models.Model):
 
     def stopVotingThread(self):
         currentStatus = PlayStatus.objects.get(pk=1)
-        if (currentStatus.votingProcess != -1):
-            spotifyUser = SpotifyUser.objects.get(pk=1)
-            spotifyUser.stopSong()
-            os.kill(currentStatus.votingProcess, signal.SIGTERM)
-        currentStatus.isPlaying = False
-        currentStatus.votingProcess = -1
-        currentStatus.save()
+        try:
+            if (currentStatus.votingProcess != -1):
+                spotifyUser = SpotifyUser.objects.get(pk=1)
+                spotifyUser.stopSong()
+                os.kill(currentStatus.votingProcess, signal.SIGTERM)
+            currentStatus.isPlaying = False
+            currentStatus.votingProcess = -1
+            currentStatus.save()
+        except ProcessLookupError:
+            currentStatus.isPlaying = False
+            currentStatus.votingProcess = -1
+            currentStatus.save()
+
+        
+
