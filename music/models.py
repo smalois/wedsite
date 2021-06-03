@@ -36,26 +36,23 @@ class SpotifyUser(models.Model):
         header = {"Authorization": "Bearer " + self.access_token, "Accept": "application/json", "Content-Type": "application/json"}
         data = { "uris" : [music.PLAYSONG_URI + songId]}
         print("Playing: " + songId)
-        song = Song.objects.get(song_id=songId)
-        song.has_been_played = True
-        song.save()
-        # response = requests.put(music.ENDPOINT_PLAYSONG, headers=header, json=data)
-        # if (response.ok): 
-        #     song = Song.objects.get(song_id)
-        #     song.has_been_played = True
-        #     song.save()
+        response = requests.put(music.ENDPOINT_PLAYSONG, headers=header, json=data)
+        if (response.ok): 
+            song = Song.objects.get(song_id=songId)
+            song.has_been_played = True
+            song.save()
 
     # UNTESTED
     def enqueueSong(self, songId):
         self.optionallyRefreshToken()
         header = {"Authorization": "Bearer " + self.access_token, "Accept": "application/json", "Content-Type": "application/json"}
         data = {"uri" : [music.PLAYSONG_URI + songId]}
-        # response = requests.post(music.ENDPOINT_ENQUEUE, headers=header, params=data)
-        # if (response.ok):
-        #     print("Adding song to queue: " + songId)
-        # else:
-        #     print("failed")
-        #     print(response.text)
+        response = requests.post(music.ENDPOINT_ENQUEUE, headers=header, params=data)
+        if (response.ok):
+            print("Adding song to queue: " + songId)
+        else:
+            print("failed")
+            print(response.text)
 
     def stopSong(self):
         self.optionallyRefreshToken()

@@ -58,9 +58,9 @@ class PlayStatus(models.Model):
         while (True):
             songEndTime = timezone.now() + timezone.timedelta(seconds=winningChoice.song.length / 1000)
             voteEndTime = songEndTime - timezone.timedelta(seconds=VOTE_TRANSITION_SECONDS) # TODO This could be 0
-            print("Waiting for voting to end...", end="")
+            # print("Waiting for voting to end...", end="")
             while (timezone.now() < voteEndTime):
-                print(".", end="", flush=True)
+                # print(".", end="", flush=True)
                 time.sleep(THREAD_POLL_RATE_SECONDS)
 
             # Select the song to play
@@ -71,9 +71,9 @@ class PlayStatus(models.Model):
             # Stop the voting here
             Choice.objects.all().update(voteEnabled=False)
 
-            print("\nVoting finished, waiting for song to end...", end="")
+            # print("\nVoting finished, waiting for song to end...", end="")
             while (timezone.now() < songEndTime):
-                print(".", end="")
+                # print(".", end="")
                 time.sleep(THREAD_POLL_RATE_SECONDS)
 
             currentStatus.refreshChoices()
