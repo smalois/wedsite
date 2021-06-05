@@ -41,3 +41,7 @@ def getPlaylist(request):
     spotifyUser = SpotifyUser.objects.get(pk=1)
     spotifyUser.updatePlaylist()
     return redirect("main-index")
+
+def getProgress(request):
+    spotifyUser = SpotifyUser.objects.get(pk=1)
+    return redirect("main-index")

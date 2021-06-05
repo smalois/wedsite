@@ -8,4 +8,5 @@ urlpatterns = [
     path('stopApp', views.stopApp, name='Stop'),
     path('getDevices', views.getDevices, name='get-devices'),
     path('getPlaylist', views.getPlaylist, name='get-playlist'),
+    path('getProgress', views.getProgress, name='get-progress'),
 ]

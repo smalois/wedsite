@@ -42,7 +42,6 @@ class SpotifyUser(models.Model):
             song.has_been_played = True
             song.save()
 
-    # UNTESTED
     def enqueueSong(self, songId):
         self.optionallyRefreshToken()
         header = {"Authorization": "Bearer " + self.access_token, "Accept": "application/json", "Content-Type": "application/json"}
@@ -63,6 +62,18 @@ class SpotifyUser(models.Model):
             print("Successfully stopped playing music")
         else: 
             print("Failed to stop the music")
+
+    def querySpotifyForSongProgressMS(self):
+        self.optionallyRefreshToken()
+        header = {"Authorization": "Bearer " + self.access_token, "Accept": "application/json", "Content-Type": "application/json"}
+        response = requests.get(music.ENDPOINT_GET_PLAYBACK_INFO, headers = header)
+        jsonResponse = response.json()
+        if (response.ok):
+            return jsonResponse["progress_ms"]
+        else:
+            print("status code: " + str(response))
+            return  None
+
 
     def getDevices(self):
         self.optionallyRefreshToken()

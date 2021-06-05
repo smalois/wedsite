@@ -56,8 +56,10 @@ class PlayStatus(models.Model):
         Guest.objects.all().update(hasVoted=False)
 
         while (True):
-            songEndTime = timezone.now() + timezone.timedelta(seconds=winningChoice.song.length / 1000)
+            songLength = timezone.timedelta(milliseconds=winningChoice.song.length)
+            songEndTime = timezone.now() + songLength
             voteEndTime = songEndTime - timezone.timedelta(seconds=VOTE_TRANSITION_SECONDS) # TODO This could be 0
+
             # print("Waiting for voting to end...", end="")
             while (timezone.now() < voteEndTime):
                 # print(".", end="", flush=True)
@@ -70,6 +72,12 @@ class PlayStatus(models.Model):
 
             # Stop the voting here
             Choice.objects.all().update(voteEnabled=False)
+
+            # Synchronize server playtime with Spotify
+            print("Song end time: " + str(songEndTime))
+            songTimeLeft = songLength - timezone.timedelta(milliseconds=int(spotifyUser.querySpotifyForSongProgressMS()))
+            songEndTime = timezone.now() + songTimeLeft
+            print("New song end time: " + str(songEndTime))
 
             # print("\nVoting finished, waiting for song to end...", end="")
             while (timezone.now() < songEndTime):
