@@ -9,14 +9,9 @@
 <div class="navbar">
     <a href="{% url 'main-index' %}" >Home</a>
     <a href="{% url 'vote-index' %}" >Vote</a>
-    <a href="{% url 'results' %}"class="active">Results</a>
+    <a href="{% url 'results' %}">Results</a>
     <a href="{% url 'music-playing' %}">Playing</a>
-    <a href="{% url 'scavenge-index' %}">Scavenger Hunt</a>
+    <a href="{% url 'scavenge-index' %}"class="active">Scavenger Hunt</a>
 </div>
 
-<h1>Results:</h1>
-<ul>
-    {% for choice in choices %}
-    <li> {{choice.votes}}: {{ choice.song.name }}</li>
-    {% endfor %}
-</ul>
+<P>This is the scavenger hunt page.</P>

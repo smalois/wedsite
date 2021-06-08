@@ -22,4 +22,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('music/', include('music.urls')),
     path('guest/', include('guest.urls')),
+    path('scavenge/', include('scavenge.urls')),
 ]
