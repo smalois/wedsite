@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect
 from choicepoll.models import Choice
 from .models import PlayStatus
 
-from music.models import SpotifyUser
+from music.models import SpotifyUser, Device
 
 def index(request):
     if (request.user.is_superuser):
@@ -12,6 +12,7 @@ def index(request):
             context = {
                 "spotifyuser" : SpotifyUser.objects.get(pk=1),
                 "playstatus" : PlayStatus.objects.get(pk=1),
+                "devices" : Device.objects.all(),
             }
             return render(request, 'main/admin.html', context)
         return render(request, 'main/admin.html')
@@ -37,11 +38,18 @@ def getDevices(request):
     spotifyUser.getDevices()
     return redirect("main-index")
 
+def useDevice(request):
+    state = PlayStatus(pk=1)
+    state.targetDevice=request.POST["selected_device"]
+    state.save()
+    return redirect("main-index")
+
 def getPlaylist(request):
     spotifyUser = SpotifyUser.objects.get(pk=1)
     spotifyUser.updatePlaylist()
     return redirect("main-index")
 
+# don't use this
 def getProgress(request):
     spotifyUser = SpotifyUser.objects.get(pk=1)
     return redirect("main-index")

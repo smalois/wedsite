@@ -24,6 +24,17 @@
     <input type="submit" value="Get Devices">
 </form>
 
+<form action="useDevice" method="post">
+    {% csrf_token %}                                                                                                                                                                           
+    <label for="devices">Choose a device to play from:</label>
+    <select id="selected_device" name="selected_device">
+      {% for device in devices %}
+        <option value="{{ device.device_id }}">{{ device.name }}</option>
+      {% endfor %}
+    </select>
+    <input type="submit" value="Select device">
+</form>
+
 <form action="getPlaylist" method="post">
     {% csrf_token %}                                                                                                                                                                           
     <input type="submit" value="Get Playlist">

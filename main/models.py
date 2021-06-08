@@ -22,6 +22,7 @@ class PlayStatus(models.Model):
     isPlaying = models.BooleanField(default=False)
     votingProcess = models.IntegerField(default=-1)
     currentSong = models.CharField(max_length=200, default='No song')
+    targetDevice = models.CharField(max_length=64, default='No device')
 
     def refreshChoices(self):
         items = Song.objects.filter(has_been_played=False)
@@ -49,7 +50,7 @@ class PlayStatus(models.Model):
         winningChoice = Choice.objects.filter(votes=highestVoteCount['votes__max'])[0]
 
         # Play the song
-        spotifyUser.playSong(winningChoice.song.song_id)
+        spotifyUser.playSong(winningChoice.song.song_id, currentStatus.targetDevice)
         currentStatus.refreshChoices()
 
         # Reset all guest vote status
@@ -70,7 +71,7 @@ class PlayStatus(models.Model):
             # Select the song to play
             highestVoteCount = Choice.objects.aggregate(Max('votes'))
             winningChoice = Choice.objects.filter(votes=highestVoteCount['votes__max'])[0]
-            spotifyUser.enqueueSong(winningChoice.song.song_id)
+            spotifyUser.enqueueSong(winningChoice.song.song_id, currentStatus.targetDevice)
 
             # Stop the voting here
             Choice.objects.all().update(voteEnabled=False)

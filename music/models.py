@@ -31,10 +31,13 @@ class SpotifyUser(models.Model):
     expiration_date = models.DateTimeField(default=timezone.now)
     scope = models.CharField(max_length=256)
 
-    def playSong(self, songId):
+    def playSong(self, songId, deviceId):
         self.optionallyRefreshToken()
         header = {"Authorization": "Bearer " + self.access_token, "Accept": "application/json", "Content-Type": "application/json"}
-        data = { "uris" : [music.PLAYSONG_URI + songId]}
+        if deviceId != 'No device':
+            data = {"uris" : [music.PLAYSONG_URI + songId], "device_id" : [music.currentDevice.device_id]}
+        else:
+            data = {"uris" : [music.PLAYSONG_URI + songId]}
         print("Playing: " + songId)
         response = requests.put(music.ENDPOINT_PLAYSONG, headers=header, json=data)
         if (response.ok): 
@@ -42,10 +45,13 @@ class SpotifyUser(models.Model):
             song.has_been_played = True
             song.save()
 
-    def enqueueSong(self, songId):
+    def enqueueSong(self, songId, deviceId):
         self.optionallyRefreshToken()
         header = {"Authorization": "Bearer " + self.access_token, "Accept": "application/json", "Content-Type": "application/json"}
-        data = {"uri" : [music.PLAYSONG_URI + songId]}
+        if deviceId != 'No device':
+            data = {"uris" : [music.PLAYSONG_URI + songId], "device_id" : [music.currentDevice.device_id]}
+        else:
+            data = {"uris" : [music.PLAYSONG_URI + songId]}
         response = requests.post(music.ENDPOINT_ENQUEUE, headers=header, params=data)
         if (response.ok):
             print("Adding song to queue: " + songId)
