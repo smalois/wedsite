@@ -28,3 +28,8 @@
     {% csrf_token %}                                                                                                                                                                           
     <input type="submit" value="Get Playlist">
 </form>
+
+<form action="getProgress" method="post">
+    {% csrf_token %}                                                                                                                                                                           
+    <input type="submit" value="Get playback info">
+</form>

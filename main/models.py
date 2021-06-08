@@ -21,7 +21,7 @@ THREAD_POLL_RATE_SECONDS = .5
 class PlayStatus(models.Model):
     isPlaying = models.BooleanField(default=False)
     votingProcess = models.IntegerField(default=-1)
-    #currentSong = models.ForeignKey("music.Song", on_delete=models.CASCADE)
+    currentSong = models.CharField(max_length=200, default='No song')
 
     def refreshChoices(self):
         items = Song.objects.filter(has_been_played=False)
@@ -56,6 +56,8 @@ class PlayStatus(models.Model):
         Guest.objects.all().update(hasVoted=False)
 
         while (True):
+            currentStatus.currentSong = winningChoice.song.name
+            currentStatus.save()
             songLength = timezone.timedelta(milliseconds=winningChoice.song.length)
             songEndTime = timezone.now() + songLength
             voteEndTime = songEndTime - timezone.timedelta(seconds=VOTE_TRANSITION_SECONDS) # TODO This could be 0

@@ -1,6 +1,7 @@
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from music.models import SpotifyUser
+from main.models import PlayStatus
 
 from . import constants as music
 from . import urls
@@ -45,4 +46,9 @@ def tokenRequest(request):
         return HttpResponse("failed")
 
 def nowPlaying(request):
-    return render(request, "music/index.html")
+    playingStatus = PlayStatus.objects.get(pk=1)
+    context = {
+        'song': playingStatus.currentSong,
+    }
+
+    return render(request, "music/index.html", context)
