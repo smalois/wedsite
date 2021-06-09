@@ -4,5 +4,5 @@ from . import views
                                                                                                                                                                                                
 urlpatterns = [                                                                                                                                                                                
     path('', views.index, name='scavenge-index'),                                                                                                                                                       
-    # path('scavenge_1', views.index, name='scavenge-1'),                                                                                                                 
+    path('aggv51pm', views.stage_one, name='scavenge-1'),                                                                                                                 
 ]     
