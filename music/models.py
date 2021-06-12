@@ -55,6 +55,9 @@ class SpotifyUser(models.Model):
         response = requests.post(music.ENDPOINT_ENQUEUE, headers=header, params=data)
         if (response.ok):
             print("Adding song to queue: " + songId)
+            song = Song.objects.get(song_id=songId)
+            song.has_been_played = True
+            song.save()
         else:
             print("failed")
             print(response.text)
