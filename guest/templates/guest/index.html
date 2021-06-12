@@ -15,7 +15,11 @@
 </div>
 
 <div class="main">
-    <h2> Logged in as {{ user.username|default_if_none:"Anonymous" }} </h2>
+    {% if not user.username %}
+    <h2> Scan your nametag to log in.</h2>
+    {% else %}
+    <h2> Logged in as {{ user.username | default_if_none:"Anonymous" }} </h2>
+    {% endif %}
     <h5>Thanks for coming!</h5>
     <p>Our website lets you vote on what song plays next. Each time a new
     song plays, you can start voting for the next song to play.
