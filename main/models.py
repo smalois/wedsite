@@ -22,6 +22,7 @@ class PlayStatus(models.Model):
     isPlaying = models.BooleanField(default=False)
     votingProcess = models.IntegerField(default=-1)
     currentSong = models.CharField(max_length=200, default='No song')
+    songEndTime = models.DateTimeField(default=timezone.now, blank=True)
     targetDevice = models.CharField(max_length=64, default='No device')
 
     def refreshChoices(self):
@@ -62,6 +63,7 @@ class PlayStatus(models.Model):
             songLength = timezone.timedelta(milliseconds=winningChoice.song.length)
             songEndTime = timezone.now() + songLength
             voteEndTime = songEndTime - timezone.timedelta(seconds=VOTE_TRANSITION_SECONDS) # TODO This could be 0
+            currentStatus.songEndTime = songEndTime
 
             # print("Waiting for voting to end...", end="")
             while (timezone.now() < voteEndTime):
@@ -80,6 +82,7 @@ class PlayStatus(models.Model):
             print("Song end time: " + str(songEndTime))
             songTimeLeft = songLength - timezone.timedelta(milliseconds=int(spotifyUser.querySpotifyForSongProgressMS()))
             songEndTime = timezone.now() + songTimeLeft
+            currentStatus.songEndTim = songEndTime
             print("New song end time: " + str(songEndTime))
 
             # print("\nVoting finished, waiting for song to end...", end="")
