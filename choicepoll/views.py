@@ -2,13 +2,16 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 from .models import Choice
+from main.models import PlayStatus
 from . import urls
 
 def index(request):
     selections = Choice.objects.all()                                                                                                                                                          
+    playStatus = PlayStatus.objects.get(pk=1)
     context = {                                                                                                                                                                                
         'user': request.user,                                                                                                                                                                  
         'choices': selections,                                                                                                                                                                 
+        'playStatus': playStatus,
     }                                                                                                                                                                                          
     return render(request, 'choicepoll/index.html', context)   
 
@@ -17,9 +20,11 @@ def detail(request):
 
 def results(request):
     selections = Choice.objects.all()
+    playStatus = PlayStatus.objects.get(pk=1)
     context = {
         'choices': selections,
         'guest': request.user,
+        'playStatus': playStatus,
     }
     return render(request, 'choicepoll/results.html', context)
 

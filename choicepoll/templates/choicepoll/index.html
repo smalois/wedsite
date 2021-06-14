@@ -14,13 +14,17 @@
     <a href="{% url 'scavenge-index' %}">Scavenger Hunt</a>
 </div>
 
+{% if not playStatus.isPlaying %}
+<P> Music is not playing yet. It'll start later in the night. </P>
+{% endif %}
+
 {% if not user.is_authenticated %}
 <P> Login/Scan nametag to vote.</P>
-{% elif choices %}
+{% elif choices and playStatus.isPlaying %}
     <form action="{% url 'vote' %}" method="post">                                                                                                                                             
     {% csrf_token %}                                                                                                                                                                           
     {% for choice in choices %}                                                                                                                                                                
-        <input type="radio" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}">                                                                                            
+        <input type="submit" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}">                                                                                            
         <label for="choice{{ forloop.counter }}">{{ choice.song.name }}</label><br>                                                                                                            
     {% endfor %}                                                                                                                                                                               
     <input type="submit" value="Vote">                                                                                                                                                         
