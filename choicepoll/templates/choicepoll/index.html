@@ -21,60 +21,38 @@
     }
     
     #myBar {
-      width: 10%;
+      width: 50%;
       height: 30px;
       background-color: #04AA6D;
       text-align: center;
       line-height: 30px;
       color: white;
     }
-    </style>
-<script>
-
-var i = 0;
-function move() {
-    if (i == 0) {
-    i = 1;
-    var elem = document.getElementById("myBar");
-    var width = 1;
-    var id = setInterval(frame, 10);
-    function frame() {
-        if (width >= 100) {
-            clearInterval(id);
-            i = 0;
-        } else {
-            width++;
-            elem.style.width = width + "%";
-        }
-    }
-    }
-}
-</script>
+</style>
 
 <div class="main">
-    {% if not playStatus.isPlaying %}
-    <P> Music is not playing yet. It'll start later in the night. </P>
-
+    {% if not user.is_authenticated %}
+        <P> Login/Scan nametag to vote.</P>
     {% endif %}
 
-    {% if not user.is_authenticated %}
-    <P> Login/Scan nametag to vote.</P>
-    {% elif choices and playStatus.isPlaying %}
-        <form action="{% url 'vote' %}" method="post">                                                                                                                                             
-        {% csrf_token %}                                                                                                                                                                           
-        {% for choice in choices %}                                                                                                                                                                
-            <input type="submit" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}">                                                                                            
-            <label for="choice{{ forloop.counter }}">{{ choice.song.name }}</label><br>                                                                                                            
-        {% endfor %}                                                                                                                                                                               
-        <input type="submit" value="Vote">                                                                                                                                                         
-        </form>                                                                                                                                                                                    
+    {% if playing %}
+        {% if choices %}
+            <form action="{% url 'vote' %}" method="post">                                                                                                                                             
+            {% csrf_token %}                                                                                                                                                                           
+            {% for choice in choices %}                                                                                                                                                                
+                <input type="submit" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}">                                                                                            
+                <label for="choice{{ forloop.counter }}">{{ choice.song.name }}</label><br>                                                                                                            
+            {% endfor %}                                                                                                                                                                               
+            <input type="submit" value="Vote">                                                                                                                                                         
+            </form>                                                                                                                                                                                    
 
-    <div id="myProgress">
-        <div id="myBar">Percentage...</div>
-    </div>
+            <p id="timeText">{{ timeRemaining }} seconds left to vote for the next song...</p>
+            <div id="myProgress">
+                <div id="myBar"></div>
+            </div>
 
-    <button onclick="move()">Click Me</button> 
+        {% endif %}
     {% else %}                                                                                                                                                                                     
-        <p>No polls are available.</p>                                                                                                                                                             
-    {% endif %}   
+        <P> Music is not playing yet. It'll start later in the night. </P>
+    {% endif %}
 </div>

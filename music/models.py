@@ -35,8 +35,12 @@ class SpotifyUser(models.Model):
         self.optionallyRefreshToken()
         header = {"Authorization": "Bearer " + self.access_token, "Accept": "application/json", "Content-Type": "application/json"}
         if deviceId != 'No device':
-            data = {"uris" : [music.PLAYSONG_URI + songId], "device_id" : [music.currentDevice.device_id]}
+            print("No device selected")
+            # FIXME
+            # This won't work because device_id doesn't belong in the json section
+            data = {"uris" : [music.PLAYSONG_URI + songId], "device_id" : deviceId}
         else:
+            print("Default device")
             data = {"uris" : [music.PLAYSONG_URI + songId]}
         print("Playing: " + songId)
         response = requests.put(music.ENDPOINT_PLAYSONG, headers=header, json=data)
@@ -49,9 +53,12 @@ class SpotifyUser(models.Model):
         self.optionallyRefreshToken()
         header = {"Authorization": "Bearer " + self.access_token, "Accept": "application/json", "Content-Type": "application/json"}
         if deviceId != 'No device':
-            data = {"uris" : [music.PLAYSONG_URI + songId], "device_id" : [music.currentDevice.device_id]}
+            print("No device selected")
+            data = {"uri" : (music.PLAYSONG_URI + songId), "device_id" : [deviceId]}
         else:
-            data = {"uris" : [music.PLAYSONG_URI + songId]}
+            print("Default device")
+            data = {"uri" : (music.PLAYSONG_URI + songId)}
+        print(str(data))
         response = requests.post(music.ENDPOINT_ENQUEUE, headers=header, params=data)
         if (response.ok):
             print("Adding song to queue: " + songId)

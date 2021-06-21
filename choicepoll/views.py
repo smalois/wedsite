@@ -1,17 +1,22 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
+from django.utils import timezone 
 from .models import Choice
 from main.models import PlayStatus
+from music import constants
 from . import urls
+
 
 def index(request):
     selections = Choice.objects.all()                                                                                                                                                          
     playStatus = PlayStatus.objects.get(pk=1)
+    votingTimeRemaining = (playStatus.songEndTime - timezone.now()) 
     context = {                                                                                                                                                                                
         'user': request.user,                                                                                                                                                                  
         'choices': selections,                                                                                                                                                                 
-        'playStatus': playStatus,
+        'playing': playStatus.isPlaying,
+        'timeRemaining': votingTimeRemaining.seconds,
     }                                                                                                                                                                                          
     return render(request, 'choicepoll/index.html', context)   
 

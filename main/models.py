@@ -5,6 +5,7 @@ from music.models import Song, SpotifyUser
 from choicepoll.models import Choice
 from django.db.models import Max
 from django.utils import timezone
+from music import constants
 
 import random
 import subprocess
@@ -14,9 +15,6 @@ import multiprocessing
 import os
 import signal
 
-VOTE_TRANSITION_SECONDS = 30
-CROSSFADE_LENGTH_SECONDS = 5
-THREAD_POLL_RATE_SECONDS = .5
 
 class PlayStatus(models.Model):
     isPlaying = models.BooleanField(default=False)
@@ -62,13 +60,13 @@ class PlayStatus(models.Model):
             currentStatus.save()
             songLength = timezone.timedelta(milliseconds=winningChoice.song.length)
             songEndTime = timezone.now() + songLength
-            voteEndTime = songEndTime - timezone.timedelta(seconds=VOTE_TRANSITION_SECONDS) # TODO This could be 0
+            voteEndTime = songEndTime - timezone.timedelta(seconds=constants.VOTE_TRANSITION_SECONDS) # TODO This could be 0
             currentStatus.songEndTime = songEndTime
 
             # print("Waiting for voting to end...", end="")
             while (timezone.now() < voteEndTime):
                 # print(".", end="", flush=True)
-                time.sleep(THREAD_POLL_RATE_SECONDS)
+                time.sleep(constants.THREAD_POLL_RATE_SECONDS)
 
             # Select the song to play
             highestVoteCount = Choice.objects.aggregate(Max('votes'))
@@ -82,13 +80,13 @@ class PlayStatus(models.Model):
             print("Song end time: " + str(songEndTime))
             songTimeLeft = songLength - timezone.timedelta(milliseconds=int(spotifyUser.querySpotifyForSongProgressMS()))
             songEndTime = timezone.now() + songTimeLeft
-            currentStatus.songEndTim = songEndTime
+            currentStatus.songEndTime = songEndTime
             print("New song end time: " + str(songEndTime))
 
             # print("\nVoting finished, waiting for song to end...", end="")
             while (timezone.now() < songEndTime):
                 # print(".", end="")
-                time.sleep(THREAD_POLL_RATE_SECONDS)
+                time.sleep(constants.THREAD_POLL_RATE_SECONDS)
 
             currentStatus.refreshChoices()
             Guest.objects.all().update(hasVoted=False)
