@@ -37,13 +37,16 @@
 
     {% if playing %}
         {% if choices %}
-            <form action="{% url 'vote' %}" method="post">                                                                                                                                             
-            {% csrf_token %}                                                                                                                                                                           
             {% for choice in choices %}                                                                                                                                                                
-                <input type="submit" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}">                                                                                            
-                <label for="choice{{ forloop.counter }}">{{ choice.song.name }}</label><br>                                                                                                            
+            <form id="choice{{ forloop.counter }}" action="{% url 'vote' %}" method="post">                                                                                                                                             
+                {% csrf_token %}                                                                                                                                                                           
+                <button class="button button{{ forloop.counter }}" type="submit" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}">
+                    {{ choice.song.name }}<br/>
+                    <small>
+                    {{choice.song.artist_name}}
+                    </small>
+                </button>
             {% endfor %}                                                                                                                                                                               
-            <input type="submit" value="Vote">                                                                                                                                                         
             </form>                                                                                                                                                                                    
 
             <p id="timeText">{{ timeRemaining }} seconds left to vote for the next song...</p>
