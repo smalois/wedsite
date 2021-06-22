@@ -110,12 +110,13 @@ class SpotifyUser(models.Model):
         self.optionallyRefreshToken()
         header = {"Authorization": "Bearer " + self.access_token, "Accept": "application/json", "Content-Type": "application/json"}
         endpointURL = music.ENDPOINT_GET_PLAYLIST + music.PLAYLIST_ID + music.GETPLAYLIST_QUERY
-        print(endpointURL)
         response = requests.get(endpointURL, headers = header)
         jsonResponse = response.json()
         if (response.ok):
             for track in jsonResponse["tracks"]["items"]:
+                print(track['track'])
                 new_song = Song(song_id=track['track']['id'], 
+                                artist_name=track['track']['artists'][0]['name'],
                                 name=track['track']['name'], 
                                 length=track['track']['duration_ms'])
                 new_song.save()
