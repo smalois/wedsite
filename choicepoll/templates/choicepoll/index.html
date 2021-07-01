@@ -35,7 +35,7 @@
         <P> Login/Scan nametag to vote.</P>
     {% endif %}
 
-    {% if playing %}
+    {% if playing and user.is_authenticated %}
         {% if choices %}
             {% for choice in choices %}                                                                                                                                                                
             <form id="choice{{ forloop.counter }}" action="{% url 'vote' %}" method="post">                                                                                                                                             
@@ -49,10 +49,10 @@
             {% endfor %}                                                                                                                                                                               
             </form>                                                                                                                                                                                    
 
+            {% if timeRemaining < 1000 %}
             <p id="timeText">{{ timeRemaining }} seconds left to vote for the next song...</p>
-            <div id="myProgress">
-                <div id="myBar"></div>
-            </div>
+            {% endif %}
+
 
         {% endif %}
     {% else %}                                                                                                                                                                                     
