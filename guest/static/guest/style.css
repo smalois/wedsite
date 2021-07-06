@@ -14,7 +14,7 @@ body {
 
 /* Increase the font size of the heading */
 .header h1 {
-	font-size: 40px;
+	font-size: 60px;
 }
 
 /* Sticky navbar - toggles between relative and fixed, depending on the scroll position. It is positioned relative until a given offset position is met in the viewport - then it "sticks" in place (like position:fixed). The sticky value is not supported in IE or Edge 15 and earlier versions. However, for these versions the navbar will inherit default position */
@@ -31,9 +31,9 @@ body {
 	float: left;
 	display: block;
 	color: white;
-	font-size: 30px;
+	font-size: 35px;
 	text-align: center;
-	padding: 14px 20px;
+	padding: 20px 25px;
 	text-decoration: none;
 }
 
@@ -76,7 +76,7 @@ body {
 .main {   
 	-ms-flex: 70%; /* IE10 */
 	flex: 70%;
-	font-size: 25px;
+	font-size: 30px;
 	background-color: white;
 	padding: 20px;
 }
@@ -90,7 +90,7 @@ body {
 
 /* Footer */
 .footer {
-	padding: 10px;
+	padding: 10px;/
 	text-align: center;
 	background: #fad9b7;
 }
@@ -104,7 +104,7 @@ body {
 	text-align: center;
 	text-decoration: none;
 	display: inline-block;
-	font-size: 16px;
+	font-size: 30px;
 	margin: 4px 2px;
 	transition-duration: 0.4s;
 	cursor: pointer;
@@ -164,7 +164,7 @@ small {
 }
 
 /* Responsive layout - when the screen is less than 1130px wide, make the navigation links stack on top of each other instead of next to each other */
-@media screen and (max-width: 800px) {
+@media screen and (max-width: 900px) {
 	.navbar a {
 		float: none;
 		width: 100%;
