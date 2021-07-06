@@ -31,6 +31,7 @@ body {
 	float: left;
 	display: block;
 	color: white;
+	font-size: 30px;
 	text-align: center;
 	padding: 14px 20px;
 	text-decoration: none;
@@ -75,6 +76,7 @@ body {
 .main {   
 	-ms-flex: 70%; /* IE10 */
 	flex: 70%;
+	font-size: 25px;
 	background-color: white;
 	padding: 20px;
 }
@@ -161,8 +163,8 @@ small {
 	}
 }
 
-/* Responsive layout - when the screen is less than 400px wide, make the navigation links stack on top of each other instead of next to each other */
-@media screen and (max-width: 400px) {
+/* Responsive layout - when the screen is less than 1130px wide, make the navigation links stack on top of each other instead of next to each other */
+@media screen and (max-width: 800px) {
 	.navbar a {
 		float: none;
 		width: 100%;
