@@ -42,4 +42,11 @@ def vote(request):
                 request.user.guest.hasVoted = True
                 request.user.guest.save()
             selected_choice.save()
-    return HttpResponseRedirect(reverse('results'))
+
+    if (not request.user.username == "MusicLaptop"):
+        return HttpResponseRedirect(reverse('results'))
+    else:
+        return render(request, 'choicepoll/laptop_wait.html')
+
+def laptop_wait(request):
+    return render(request, 'choicepoll/laptop_wait.html')
