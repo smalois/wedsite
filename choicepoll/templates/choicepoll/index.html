@@ -35,26 +35,39 @@
         <P> Login/Scan nametag to vote.</P>
     {% endif %}
 
-    {% if playing and user.is_authenticated %}
-        {% if choices %}
-            {% for choice in choices %}                                                                                                                                                                
+    {% if playing and user.is_authenticated and choices %}
+        <div style="position:relative; width:100%; justify-content: flex-end;">
+
+        {% if user.guest.hasVoted or timeRemaining <= 0 %}
+            <h1 class="overlay">Wait for the next song to vote</h1>
+            <div class="blur">
+        {% else %}
+            <div style="position:relative; width:100%">
+        {% endif %}
+
+        {% for choice in choices %}                                                                                                                                                                
             <form id="choice{{ forloop.counter }}" action="{% url 'vote' %}" method="post">                                                                                                                                             
                 {% csrf_token %}                                                                                                                                                                           
-                <button class="button button{{ forloop.counter }}" type="submit" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}">
-                    {{ choice.song.name }}<br/>
-                    <small>
-                    {{choice.song.artist_name}}
-                    </small>
-                </button>
-            {% endfor %}                                                                                                                                                                               
+                {% if user.guest.hasVoted %}
+                    <button class="button buttonDisabled" type="submit" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}" disabled>
+                        {{ choice.song.name }}<br/>
+                        <small>{{choice.song.artist_name}}</small>
+                    </button>
+                {% else %}
+                    <button class="button button{{ forloop.counter }}" type="submit" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}">
+                        {{ choice.song.name }}<br/>
+                        <small>{{choice.song.artist_name}}</small>
+                    </button>
+                {% endif %}
             </form>                                                                                                                                                                                    
+        {% endfor %}                                                                                                                                                                               
+        </div>
 
-            {% if timeRemaining < 1000 %}
-            <p id="timeText">{{ timeRemaining }} seconds left to vote for the next song...</p>
-            {% endif %}
-
-
+        {% if timeRemaining < 1000 %}
+        <p id="timeText">{{ timeRemaining }} seconds left to vote for the next song...</p>
         {% endif %}
+
+        </div>
     {% else %}                                                                                                                                                                                     
         <P> Music is not playing yet. It'll start later in the night. </P>
     {% endif %}
