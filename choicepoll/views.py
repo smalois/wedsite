@@ -38,7 +38,8 @@ def vote(request):
         selected_choice = Choice.objects.get(pk=request.POST['choice'])
         if (selected_choice.voteEnabled):
             selected_choice.votes += 1
-            request.user.guest.hasVoted = True
+            if (not request.user.username == "MusicLaptop"):
+                request.user.guest.hasVoted = True
+                request.user.guest.save()
             selected_choice.save()
-            request.user.guest.save()
     return HttpResponseRedirect(reverse('results'))
