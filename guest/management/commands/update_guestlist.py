@@ -21,7 +21,7 @@ class Command(BaseCommand):
             concat_name = row['First name'] + row['Last name']                                                                                                                                 
             h.update(str.encode(concat_name))                                                                                                                                                  
             pword = h.hexdigest()[0:8]                                                                                                                                                         
-            u = User.objects.create_user(username=concat_name, password=pword)
+            u = User.objects.create_user(first_name=first_name, last_name=last_name, username=concat_name, password=pword)
             guest = Guest(user=u, hasVoted=False)
             guest.save()
             self.stdout.write(                                                                                                                                                                 
