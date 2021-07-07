@@ -62,6 +62,7 @@ class PlayStatus(models.Model):
             songEndTime = timezone.now() + songLength
             voteEndTime = songEndTime - timezone.timedelta(seconds=constants.VOTE_TRANSITION_SECONDS) # TODO This could be 0
             currentStatus.songEndTime = songEndTime
+            currentStatus.save()
 
             # print("Waiting for voting to end...", end="")
             while (timezone.now() < voteEndTime):
