@@ -14,21 +14,19 @@
     <a href="{% url 'scavenge-index' %}">Scavenger Hunt</a>
 </div>
 
-<style>
-    #myProgress {
-      width: 100%;
-      background-color: #ddd;
+<script>
+    var timeleft = {{ timeRemaining }};
+    var downloadTimer = setInterval(function(){
+    document.getElementById("countdown").innerHTML = timeleft + " seconds until the next song.";
+    if(timeleft <= 0){
+        clearInterval(downloadTimer);
+        document.getElementById("countdown").innerHTML = "Refresh the page to vote";
+    } else {
+        document.getElementById("countdown").innerHTML = timeleft + " seconds until the next song.";
     }
-    
-    #myBar {
-      width: 50%;
-      height: 30px;
-      background-color: #04AA6D;
-      text-align: center;
-      line-height: 30px;
-      color: white;
-    }
-</style>
+    timeleft -= 1;
+    }, 1000);
+</script>
 
 <div class="main">
     {% if not user.is_authenticated %}
@@ -39,7 +37,7 @@
         <div style="position:relative; width:100%; justify-content: flex-end;">
 
         {% if user.guest.hasVoted or timeRemaining <= 0 %}
-            <h1 class="overlay">Wait for the next song to vote</h1>
+            <h2 class="overlay"><span id="countdown"></span></h2>
             <div class="blur">
         {% else %}
             <div style="position:relative; width:100%">
@@ -63,10 +61,9 @@
         {% endfor %}                                                                                                                                                                               
         </div>
 
-        {% if timeRemaining < 1000 %}
-        <p id="timeText">{{ timeRemaining }} seconds left to vote for the next song...</p>
-        {% endif %}
-
+        <p id="timeText"><span id="countdown"></span></p>
+        
+        </body>
         </div>
     {% else %}                                                                                                                                                                                     
         <P> Music is not playing yet. It'll start later in the night. </P>
