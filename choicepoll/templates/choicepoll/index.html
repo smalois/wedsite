@@ -1,4 +1,5 @@
 {% load static %}
+<html>
 
 <link rel="stylesheet" type="text/css" href="{% static 'guest/style.css' %}">
 
@@ -14,19 +15,6 @@
     <a href="{% url 'scavenge-index' %}">Scavenger Hunt</a>
 </div>
 
-<script>
-    var timeleft = {{ timeRemaining }};
-    var downloadTimer = setInterval(function(){
-    document.getElementById("countdown").innerHTML = timeleft + " seconds until the next song.";
-    if(timeleft <= 0){
-        clearInterval(downloadTimer);
-        document.getElementById("countdown").innerHTML = "Refresh the page to vote";
-    } else {
-        document.getElementById("countdown").innerHTML = timeleft + " seconds until the next song.";
-    }
-    timeleft -= 1;
-    }, 1000);
-</script>
 
 <div class="main">
     {% if not user.is_authenticated %}
@@ -36,8 +24,8 @@
     {% if playing and user.is_authenticated and choices %}
         <div style="position:relative; width:100%; justify-content: flex-end;">
 
-        {% if user.guest.hasVoted or timeRemaining <= 0 %}
-            <h2 class="overlay"><span id="countdown"></span></h2>
+        {% if user.guest.hasVoted or voteTimeRemaining > 1000 %}
+            <h2 class="overlay"><span id="countdown">{{ songTimeRemaining }}</span></h2>
             <div class="blur">
         {% else %}
             <div style="position:relative; width:100%">
@@ -46,7 +34,7 @@
         {% for choice in choices %}                                                                                                                                                                
             <form id="choice{{ forloop.counter }}" action="{% url 'vote' %}" method="post">                                                                                                                                             
                 {% csrf_token %}                                                                                                                                                                           
-                {% if user.guest.hasVoted %}
+                {% if user.guest.hasVoted or voteTimeRemaining > 1000 %}
                     <button class="button buttonDisabled" type="submit" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}" disabled>
                         {{ choice.song.name }}<br/>
                         <small>{{choice.song.artist_name}}</small>
@@ -61,7 +49,9 @@
         {% endfor %}                                                                                                                                                                               
         </div>
 
-        <p id="timeText"><span id="countdown"></span></p>
+        {% if not user.guest.hasVoted and voteTimeRemaining < 1000 %}
+        <p id="timeText"><span id="voteCountdown">{{ voteTimeRemaining }}</span></p>
+        {% endif %}
         
         </body>
         </div>
@@ -69,3 +59,38 @@
         <P> Music is not playing yet. It'll start later in the night. </P>
     {% endif %}
 </div>
+
+<script>
+    var votetimeleft_text = document.getElementById("voteCountdown");
+    if (votetimeleft_text) {
+        var votetimeleft = votetimeleft_text.textContent;
+        var voteTimer = setInterval(function(){
+        document.getElementById("voteCountdown").innerHTML = votetimeleft + " seconds until voting ends";
+        if(votetimeleft <= 0){
+            clearInterval(voteTimer);
+            location.href = "/choicepoll/";
+        } else {
+            document.getElementById("voteCountdown").innerHTML = votetimeleft + " seconds until voting ends.";
+        }
+        votetimeleft -= 1;
+        }, 1000);
+    }
+
+    var songtimeleft_text = document.getElementById("countdown");
+    if (songtimeleft_text) {
+        var songtimeleft = songtimeleft_text.textContent;
+        var songTimer = setInterval(function(){
+        document.getElementById("countdown").innerHTML = "Next song in " + songtimeleft + " seconds";
+        if(songtimeleft <= 0){
+            clearInterval(songTimer);
+            location.href = "/choicepoll/";
+        } else {
+            document.getElementById("countdown").innerHTML = "Next song in " + songtimeleft + " seconds";
+        }
+        songtimeleft -= 1;
+        }, 1000);
+    }
+
+</script>
+
+</html>

@@ -11,12 +11,14 @@ from . import urls
 def index(request):
     selections = Choice.objects.all()                                                                                                                                                          
     playStatus = PlayStatus.objects.get(pk=1)
-    votingTimeRemaining = (playStatus.songEndTime - timezone.now()) 
+    songTimeRemaining = playStatus.songEndTime - timezone.now()
+    votingTimeRemaining = songTimeRemaining - timezone.timedelta(seconds=constants.VOTE_TRANSITION_SECONDS)
     context = {                                                                                                                                                                                
         'user': request.user,                                                                                                                                                                  
         'choices': selections,                                                                                                                                                                 
         'playing': playStatus.isPlaying,
-        'timeRemaining': votingTimeRemaining.seconds,
+        'voteTimeRemaining': votingTimeRemaining.seconds,
+        'songTimeRemaining': songTimeRemaining.seconds,
     }                                                                                                                                                                                          
     return render(request, 'choicepoll/index.html', context)   
 
