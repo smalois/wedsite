@@ -79,9 +79,11 @@ class PlayStatus(models.Model):
 
             # Synchronize server playtime with Spotify
             print("Song end time: " + str(songEndTime))
-            songTimeLeft = songLength - timezone.timedelta(milliseconds=int(spotifyUser.querySpotifyForSongProgressMS()))
-            songEndTime = timezone.now() + songTimeLeft
-            currentStatus.songEndTime = songEndTime
+            songProgress = spotifyUser.querySpotifyForSongProgressMS()
+            if (songProgress):
+                songTimeLeft = songLength - timezone.timedelta(milliseconds=int(songProgress))
+                songEndTime = timezone.now() + songTimeLeft
+                currentStatus.songEndTime = songEndTime
             print("New song end time: " + str(songEndTime))
 
             # print("\nVoting finished, waiting for song to end...", end="")
