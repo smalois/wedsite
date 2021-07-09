@@ -55,7 +55,9 @@
         
         </body>
         </div>
-    {% else %}                                                                                                                                                                                     
+    {% endif %}                                                                                                                                                                                     
+
+    {% if user.is_authenticated and not playing %}
         <P> Music is not playing yet. It'll start later in the night. </P>
     {% endif %}
 </div>
@@ -68,7 +70,7 @@
         document.getElementById("voteCountdown").innerHTML = votetimeleft + " seconds until voting ends";
         if(votetimeleft <= 0){
             clearInterval(voteTimer);
-            location.href = "/choicepoll/";
+            setTimeout(() => {location.href = "/choicepoll/";}, 1000);
         } else {
             document.getElementById("voteCountdown").innerHTML = votetimeleft + " seconds until voting ends.";
         }
@@ -83,7 +85,7 @@
         document.getElementById("countdown").innerHTML = "Next song in " + songtimeleft + " seconds";
         if(songtimeleft <= 0){
             clearInterval(songTimer);
-            location.href = "/choicepoll/";
+            setTimeout(() => {location.href = "/choicepoll/";}, 1000);
         } else {
             document.getElementById("countdown").innerHTML = "Next song in " + songtimeleft + " seconds";
         }
