@@ -22,10 +22,10 @@
     {% endif %}
 
     {% if playing and user.is_authenticated and choices %}
-        <div style="position:relative; width:100%; justify-content: flex-end;">
+        <div style="height:600px; position:relative; width:100%; justify-content: flex-end;">
 
         {% if user.guest.hasVoted or voteTimeRemaining > 1000 %}
-            <h2 class="overlay"><span id="countdown">{{ songTimeRemaining }}</span></h2>
+            <h2 id="countdown" class="overlay">{{ voteTimeRemaining }}</h2>
             <div class="blur">
         {% else %}
             <div style="position:relative; width:100%">
