@@ -15,14 +15,14 @@
 </div>
 
 <div class="main">
-    {% if playStatus.isPlaying %}
+    {% if not playing %}
+        <P> Music is not playing yet. It'll start later in the night. </P>
+    {% else %}
         <h1>Results:</h1>
         <ul>
             {% for choice in choices %}
             <li> {{choice.votes}}: {{ choice.song.name }}</li>
             {% endfor %}
         </ul>
-    {% else %}
-        <P> Music is not playing yet. It'll start later in the night. </P>
     {% endif %}
 </div>

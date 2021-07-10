@@ -15,8 +15,7 @@
 </div>
 
 <div class="main">
-
-    {% if user.is_authenticated and not playing %}
+    {% if not playing %}
         <P> Music is not playing yet. It'll start later in the night. </P>
     {% else %}
         <h2>Now playing...</h2>
