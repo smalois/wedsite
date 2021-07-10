@@ -53,3 +53,8 @@ def getPlaylist(request):
 def getProgress(request):
     spotifyUser = SpotifyUser.objects.get(pk=1)
     return redirect("main-index")
+
+def unplaySongs(request):
+    spotifyUser = SpotifyUser.objects.get(pk=1)
+    spotifyUser.resetAllSongPlayedStatus()
+    return redirect("main-index")

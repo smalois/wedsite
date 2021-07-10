@@ -44,3 +44,8 @@
     {% csrf_token %}                                                                                                                                                                           
     <input type="submit" value="Get playback info">
 </form>
+
+<form action="unplaySongs" method="post">
+    {% csrf_token %}                                                                                                                                                                           
+    <input type="submit" value="Mark all songs as unplayed">
+</form>

@@ -10,4 +10,5 @@ urlpatterns = [
     path('useDevice', views.useDevice, name='use-device'),
     path('getPlaylist', views.getPlaylist, name='get-playlist'),
     path('getProgress', views.getProgress, name='get-progress'),
+    path('unplaySongs', views.unplaySongs, name='unplaySongs'),
 ]
