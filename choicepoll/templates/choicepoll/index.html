@@ -24,8 +24,8 @@
     {% if playing and user.is_authenticated and choices %}
         <div style="height:600px; position:relative; width:100%; justify-content: flex-end;">
 
-        {% if user.guest.hasVoted or voteTimeRemaining > 1000 %}
-            <h2 id="countdown" class="overlay">{{ voteTimeRemaining }}</h2>
+        {% if user.guest.hasVoted or voteTimeRemaining > 10000 %}
+            <h2 id="countdown" class="overlay">{{ songTimeRemaining }}</h2>
             <div class="blur">
         {% else %}
             <div style="position:relative; width:100%">
@@ -34,7 +34,7 @@
         {% for choice in choices %}                                                                                                                                                                
             <form id="choice{{ forloop.counter }}" action="{% url 'vote' %}" method="post">                                                                                                                                             
                 {% csrf_token %}                                                                                                                                                                           
-                {% if user.guest.hasVoted or voteTimeRemaining > 1000 %}
+                {% if user.guest.hasVoted or voteTimeRemaining > 10000 %}
                     <button class="button buttonDisabled" type="submit" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}" disabled>
                         {{ choice.song.name }}<br/>
                         <small>{{choice.song.artist_name}}</small>
@@ -49,8 +49,8 @@
         {% endfor %}                                                                                                                                                                               
         </div>
 
-        {% if not user.guest.hasVoted and voteTimeRemaining < 1000 %}
-        <p id="timeText"><span id="voteCountdown">{{ voteTimeRemaining }}</span></p>
+        {% if not user.guest.hasVoted and voteTimeRemaining < 10000 %}
+            <p id="timeText"><span id="voteCountdown">{{ voteTimeRemaining }}</span></p>
         {% endif %}
         
         </body>
