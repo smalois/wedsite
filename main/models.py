@@ -8,12 +8,10 @@ from django.utils import timezone
 from music import constants
 
 import random
-import subprocess
 import time
 
-import multiprocessing
+import threading
 import os
-import signal
 
 
 class PlayStatus(models.Model):
@@ -55,7 +53,7 @@ class PlayStatus(models.Model):
         # Reset all guest vote status
         Guest.objects.all().update(hasVoted=False)
 
-        while (True):
+        while (PlayStatus.objects.get(pk=1).isPlaying):
             currentStatus.currentSong = winningChoice.song.name
             currentStatus.save()
             songLength = timezone.timedelta(milliseconds=winningChoice.song.length)
@@ -65,7 +63,7 @@ class PlayStatus(models.Model):
             currentStatus.save()
 
             # print("Waiting for voting to end...", end="")
-            while (timezone.now() < voteEndTime):
+            while (timezone.now() < voteEndTime and PlayStatus.objects.get(pk=1).isPlaying):
                 # print(".", end="", flush=True)
                 time.sleep(constants.THREAD_POLL_RATE_SECONDS)
 
@@ -87,7 +85,7 @@ class PlayStatus(models.Model):
             print("New song end time: " + str(songEndTime))
 
             # print("\nVoting finished, waiting for song to end...", end="")
-            while (timezone.now() < songEndTime):
+            while (timezone.now() < songEndTime and PlayStatus.objects.get(pk=1).isPlaying):
                 # print(".", end="")
                 time.sleep(constants.THREAD_POLL_RATE_SECONDS)
 
@@ -96,25 +94,15 @@ class PlayStatus(models.Model):
             # Restart the voting here
 
     def startVotingThread(self):
-        p = multiprocessing.Process(target=self.startVoteLoop)
-        self.isPlaying = True
-        p.start()
-        self.save()
+        if (not self.isPlaying):
+            t = threading.Thread(target=self.startVoteLoop, daemon=True)
+            self.isPlaying = True
+            self.save()
+            t.start()
 
     def stopVotingThread(self):
         currentStatus = PlayStatus.objects.get(pk=1)
-        try:
-            if (currentStatus.votingProcess != -1):
-                spotifyUser = SpotifyUser.objects.get(pk=1)
-                spotifyUser.stopSong()
-                os.kill(currentStatus.votingProcess, signal.SIGTERM)
+        if (currentStatus.isPlaying):
             currentStatus.isPlaying = False
             currentStatus.votingProcess = -1
             currentStatus.save()
-        except ProcessLookupError:
-            currentStatus.isPlaying = False
-            currentStatus.votingProcess = -1
-            currentStatus.save()
-
-        
-

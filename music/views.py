@@ -49,6 +49,7 @@ def nowPlaying(request):
     playingStatus = PlayStatus.objects.get(pk=1)
     context = {
         'song': playingStatus.currentSong,
+        'playing': playingStatus.isPlaying,
     }
 
     return render(request, "music/index.html", context)
