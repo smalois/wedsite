@@ -82,6 +82,7 @@ class PlayStatus(models.Model):
                 songTimeLeft = songLength - timezone.timedelta(milliseconds=int(songProgress))
                 songEndTime = timezone.now() + songTimeLeft
                 currentStatus.songEndTime = songEndTime
+                currentStatus.save()
             print("New song end time: " + str(songEndTime))
 
             # print("\nVoting finished, waiting for song to end...", end="")
