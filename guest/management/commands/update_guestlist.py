@@ -18,6 +18,7 @@ class Command(BaseCommand):
         for row in csv_reader:                                                                                                                                                                 
             first_name = row['First name']
             last_name = row['Last name']
+            table_number = row['Table Number']
             concat_name = row['First name'] + row['Last name']                                                                                                                                 
             h.update(str.encode(concat_name))                                                                                                                                                  
             pword = h.hexdigest()[0:8]                                                                                                                                                         
@@ -25,7 +26,7 @@ class Command(BaseCommand):
             guest = Guest(user=u, hasVoted=False)
             guest.save()
             self.stdout.write(                                                                                                                                                                 
-                    self.style.SUCCESS("%s,%s,%s,1" % (first_name, last_name, pword)))                                                                                                                        
+                    self.style.SUCCESS("%s,%s,%s,%s" % (first_name, last_name, pword, table_number)))
                                                                                                                                                                                                
                                                                                                                                                                                                
     def handle(self, *argrs, **options):                                                                                                                                                       
