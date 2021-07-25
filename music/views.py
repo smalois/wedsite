@@ -39,10 +39,9 @@ def tokenRequest(request):
             expiration_date = datetime.now() + timedelta(seconds=int(response.json()["expires_in"]))
             scope = response.json()["scope"]
 
-            playerAccount = SpotifyUser(id=1, access_token=access_token, refresh_token=refresh_token, scope=scope)
+            playerAccount = SpotifyUser(id=1, access_token=access_token, expiration_date=expiration_date, refresh_token=refresh_token, scope=scope)
             playerAccount.save()
             return redirect("main-index")
-
         return HttpResponse("failed")
 
 def nowPlaying(request):

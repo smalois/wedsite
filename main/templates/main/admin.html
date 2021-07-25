@@ -40,12 +40,17 @@
     <input type="submit" value="Get Playlist">
 </form>
 
-<form action="getProgress" method="post">
+<form action="updateStatus" method="post">
     {% csrf_token %}                                                                                                                                                                           
-    <input type="submit" value="Get playback info">
+    <input type="submit" value="Resynchronize server to playback">
 </form>
 
 <form action="unplaySongs" method="post">
     {% csrf_token %}                                                                                                                                                                           
     <input type="submit" value="Mark all songs as unplayed">
+</form>
+
+<form action="refreshToken" method="post">
+    {% csrf_token %}                                                                                                                                                                           
+    <input type="submit" value="Refresh token">
 </form>

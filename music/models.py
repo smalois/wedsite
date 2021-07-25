@@ -12,9 +12,6 @@ class Song(models.Model):
     length = models.IntegerField()
     has_been_played = models.BooleanField(default=False)
 
-    def resetPlayedStatus():
-        Song.objects.all().update(has_been_played=False)
-
     def __str__(self):
         return self.name
 
@@ -33,7 +30,7 @@ class SpotifyUser(models.Model):
 
     def playSong(self, songId, deviceId):
         self.optionallyRefreshToken()
-        header = {"Authorization": "Bearer " + self.access_token, "Accept": "application/json", "Content-Type": "application/json"}
+        header = {"Authorization": "Bearer " + SpotifyUser.objects.get(pk=1).access_token, "Accept": "application/json", "Content-Type": "application/json"}
         if deviceId != 'No device':
             print("No device selected")
             # FIXME
@@ -51,7 +48,7 @@ class SpotifyUser(models.Model):
 
     def enqueueSong(self, songId, deviceId):
         self.optionallyRefreshToken()
-        header = {"Authorization": "Bearer " + self.access_token, "Accept": "application/json", "Content-Type": "application/json"}
+        header = {"Authorization": "Bearer " + SpotifyUser.objects.get(pk=1).access_token, "Accept": "application/json", "Content-Type": "application/json"}
         if deviceId != 'No device':
             print("No device selected")
             data = {"uri" : (music.PLAYSONG_URI + songId), "device_id" : [deviceId]}
@@ -71,7 +68,7 @@ class SpotifyUser(models.Model):
 
     def stopSong(self):
         self.optionallyRefreshToken()
-        header = {"Authorization": "Bearer " + self.access_token, "Accept": "application/json", "Content-Type": "application/json"}
+        header = {"Authorization": "Bearer " + SpotifyUser.objects.get(pk=1).access_token, "Accept": "application/json", "Content-Type": "application/json"}
         print("Stopping")
         response = requests.put(music.ENDPOINT_STOP, headers=header)
         if (response.ok):
@@ -81,7 +78,7 @@ class SpotifyUser(models.Model):
 
     def querySpotifyForSongProgressMS(self):
         self.optionallyRefreshToken()
-        header = {"Authorization": "Bearer " + self.access_token, "Accept": "application/json", "Content-Type": "application/json"}
+        header = {"Authorization": "Bearer " + SpotifyUser.objects.get(pk=1).access_token, "Accept": "application/json", "Content-Type": "application/json"}
         response = requests.get(music.ENDPOINT_GET_PLAYBACK_INFO, headers = header)
         jsonResponse = response.json()
         if (response.ok):
@@ -90,10 +87,27 @@ class SpotifyUser(models.Model):
             print("status code: " + str(response))
             return  None
 
+    def getPlayStatusInfo(self):
+        self.optionallyRefreshToken()
+        header = {"Authorization": "Bearer " + SpotifyUser.objects.get(pk=1).access_token, "Accept": "application/json", "Content-Type": "application/json"}
+        response = requests.get(music.ENDPOINT_GET_PLAYBACK_INFO, headers = header)
+        jsonResponse = response.json()
+        if (response.ok):
+            song_id = jsonResponse["item"]["id"]
+            song_name = jsonResponse["item"]["name"]
+            song_duration = jsonResponse["item"]["duration_ms"]
+            song_progress = jsonResponse["progress_ms"]
+            ms_remaining = song_duration - song_progress
+            song_end_time = timezone.now() + timezone.timedelta(milliseconds=ms_remaining)
+            return (song_name, song_end_time)
+        else:
+            print("status code: " + str(response))
+            return  (None, None)
+
 
     def getDevices(self):
         self.optionallyRefreshToken()
-        header = {"Authorization": "Bearer " + self.access_token, "Accept": "application/json", "Content-Type": "application/json"}
+        header = {"Authorization": "Bearer " + SpotifyUser.objects.get(pk=1).access_token, "Accept": "application/json", "Content-Type": "application/json"}
         response = requests.get(music.ENDPOINT_GET_DEVICES, headers = header)
         jsonResponse = response.json()
         if (response.ok):
@@ -108,7 +122,7 @@ class SpotifyUser(models.Model):
 
     def updatePlaylist(self):
         self.optionallyRefreshToken()
-        header = {"Authorization": "Bearer " + self.access_token, "Accept": "application/json", "Content-Type": "application/json"}
+        header = {"Authorization": "Bearer " + SpotifyUser.objects.get(pk=1).access_token, "Accept": "application/json", "Content-Type": "application/json"}
         song_count = 0 
 
         while (song_count == 0) or ((song_count % 100) == 0):
@@ -132,9 +146,10 @@ class SpotifyUser(models.Model):
                 print("status code: " + str(response.status_code))
 
     def optionallyRefreshToken(self):
-        if self.expiration_date <= timezone.now():
+        if SpotifyUser.objects.get(pk=1).expiration_date <= timezone.now():
+            print("Auth token expired, refreshing now")
             header = {"Authorization": "Basic " + music.ENCODED_PAIR}
-            data = {"grant_type":"refresh_token", "refresh_token": self.refresh_token}
+            data = {"grant_type":"refresh_token", "refresh_token": SpotifyUser.objects.get(pk=1).refresh_token}
             response = requests.post(music.ENDPOINT_TOKEN, data = data, headers = header)
 
             if (response.ok):
@@ -142,9 +157,42 @@ class SpotifyUser(models.Model):
                 scope = response.json()["scope"]
                 expiration_date = timezone.now() + timezone.timedelta(seconds=int(response.json()["expires_in"]))
 
-                playerAccount = SpotifyUser(id=1, access_token=access_token, refresh_token=self.refresh_token, scope=scope)
+                playerAccount = SpotifyUser.objects.get(id=1)
+                playerAccount.expiration_date = expiration_date
+                playerAccount.access_token=access_token
+                playerAccount.scope = scope
                 playerAccount.save()
+                print("Successful automatic token refresh")
+            else:
+                print("Unable to refresh token")
+                print(response)
 
+    def refreshToken(self):
+        header = {"Authorization": "Basic " + music.ENCODED_PAIR}
+        data = {"grant_type":"refresh_token", "refresh_token": SpotifyUser.objects.get(pk=1).refresh_token}
+        response = requests.post(music.ENDPOINT_TOKEN, data = data, headers = header)
+
+        if (response.ok):
+            access_token = response.json()["access_token"]
+            scope = response.json()["scope"]
+            expiration_date = timezone.now() + timezone.timedelta(seconds=int(response.json()["expires_in"]))
+
+            playerAccount = SpotifyUser.objects.get(id=1)
+            playerAccount.expiration_date = expiration_date
+            playerAccount.access_token=access_token
+            playerAccount.scope = scope
+            playerAccount.save()
+            print("Successful manual token refresh")
+        else:
+            print("Unable to manually refresh token")
+            print(response)
+
+    def resetAllSongPlayedStatus(self):
+        songs = list(Song.objects.all())
+        for song in songs:
+            song.has_been_played = False
+        Song.objects.bulk_update(songs, ['has_been_played'])
+        
 
     def __str__(self):
         return self.access_token[-5:]

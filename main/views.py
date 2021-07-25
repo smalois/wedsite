@@ -49,9 +49,14 @@ def getPlaylist(request):
     spotifyUser.updatePlaylist()
     return redirect("main-index")
 
-# don't use this
-def getProgress(request):
+def updateStatus(request):
+    state = PlayStatus(pk=1)
+    state.resynchronize()
+    return redirect("main-index")
+
+def refreshToken(request):
     spotifyUser = SpotifyUser.objects.get(pk=1)
+    spotifyUser.refreshToken()
     return redirect("main-index")
 
 def unplaySongs(request):
