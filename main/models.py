@@ -44,7 +44,7 @@ class PlayStatus(models.Model):
 
         # Select the song to play
         highestVoteCount = Choice.objects.aggregate(Max('votes'))
-        first_song = Song.objects.get(song_id="7p6PJdqPyJLc9NeG5RcDk9")
+        first_song = Song.objects.get(song_id=constants.FIRST_SONG_ID)
         winningChoice = Choice(choice_text="First song", song=first_song, votes=1)
 
         # Play the song
