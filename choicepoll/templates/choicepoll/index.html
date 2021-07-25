@@ -72,7 +72,7 @@
             clearInterval(voteTimer);
             setTimeout(() => {location.href = "/choicepoll/";}, 1000);
         } else {
-            document.getElementById("voteCountdown").innerHTML = votetimeleft + " seconds until voting ends.";
+            document.getElementById("voteCountdown").innerHTML = votetimeleft + " seconds until voting ends";
         }
         votetimeleft -= 1;
         }, 1000);
