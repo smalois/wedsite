@@ -15,6 +15,21 @@
 </div>
 
 <div class="main">
-    <P>This is the scavenger hunt page.</P>
-    <p>Start by clicking <a href="{% url 'scavenge-1' %}">this link</a>.</p>
+    <h2>Scavenger Hunt</h2>
+    <P>Welcome to the scavenger hunt page!<br></P>
+    <P>You'll be shown a series of clues that will guide you to different
+    locations around the museum. Each clue will describe a location where a QR
+    code has been hidden. Scan the QR code with your phone to be shown the next
+    clue. Your progress will be tracked on your account at the bottom of the
+    page. <br></P>
+
+    <P>Some basic rules:<br></P>
+    <ul>
+        <li>Don't move or hide the clues from others</li>
+        <li>The clues are all hidden in publicly accessible areas (none are in bathrooms). </li>
+        <li>Try not to spoil the clue locations for others</li>
+        <li>Feel free to work with others!</li>
+    </ul>
+
+    <p><a href="{% url 'scavenge-1' %}">This link will take you to the first clue</a></p>
 </div>
