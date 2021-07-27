@@ -55,16 +55,13 @@ class PlayStatus(models.Model):
         Guest.objects.all().update(hasVoted=False)
 
         while (PlayStatus.objects.get(pk=1).isPlaying):
-            print("Starting the thread loop with song: " + winningChoice.song.name)
             currentStatus.currentSong = winningChoice.song.name
             songLength = timezone.timedelta(milliseconds=winningChoice.song.length)
             transition_timedelta = timezone.timedelta(seconds=constants.VOTE_TRANSITION_SECONDS) # TODO This could be 0
             currentStatus.songEndTime = timezone.now() + songLength
             currentStatus.save()
 
-            print("Waiting for voting to end...", end="")
             while (timezone.now() < (PlayStatus.objects.get(pk=1).songEndTime - transition_timedelta) and PlayStatus.objects.get(pk=1).isPlaying):
-                print(".", end="", flush=True)
                 time.sleep(constants.THREAD_POLL_RATE_SECONDS)
 
             # Select the song to play
@@ -77,24 +74,18 @@ class PlayStatus(models.Model):
             Choice.objects.all().update(voteEnabled=False)
 
             # Synchronize server playtime with Spotify
-            print("Song end time: " + str(currentStatus.songEndTime))
             songProgress = spotifyUser.querySpotifyForSongProgressMS()
             if (songProgress):
                 songTimeLeft = songLength - timezone.timedelta(milliseconds=int(songProgress))
                 currentStatus.songEndTime = timezone.now() + songTimeLeft
                 currentStatus.save()
-            print("New song end time: " + str(currentStatus.songEndTime))
 
-            print("\nVoting finished, waiting for song to end...", end="")
             while (timezone.now() < PlayStatus.objects.get(pk=1).songEndTime and PlayStatus.objects.get(pk=1).isPlaying):
-                print(".", end="")
                 time.sleep(constants.THREAD_POLL_RATE_SECONDS)
 
             currentStatus.refreshChoices()
             Guest.objects.all().update(hasVoted=False)
             # Restart the voting here
-
-        print("Finished with this thread")
 
     def startVotingThread(self):
         if (not self.isPlaying):
@@ -107,12 +98,9 @@ class PlayStatus(models.Model):
         currentStatus = PlayStatus.objects.get(pk=1)
         spotifyUser = SpotifyUser.objects.get(pk=1)
         name, endtime = spotifyUser.getPlayStatusInfo()
-        print("Resynchronizing the following values:")
         if (name):
-            print(name)
             currentStatus.currentSong = name
         if (endtime):
-            print(endtime)
             currentStatus.songEndTime = endtime
         currentStatus.save()
 

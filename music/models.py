@@ -133,7 +133,7 @@ class SpotifyUser(models.Model):
             jsonResponse = response.json()
             if (response.ok):
                 for track in jsonResponse["items"]:
-                    print (song_count)
+                    print(song_count)
                     print(track)
                     new_song = Song(song_id=track['track']['id'], 
                                     artist_name=track['track']['artists'][0]['name'],
