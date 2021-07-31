@@ -29,8 +29,7 @@ class PlayStatus(models.Model):
         random_items = random.sample(list(items), 4)
         # MySQL doesn't like 0 index
         for i in range(1,5):
-            newChoice = Choice(pk=i, song=random_items[i - 1], choice_text=random_items[i - 1].name)
-            newChoice.voteEnabled = True
+            newChoice = Choice(pk=i, song=random_items[i - 1], choice_text=random_items[i - 1].name, voteEnabled=True)
             newChoice.save()
 
     def startVoteLoop(self):
