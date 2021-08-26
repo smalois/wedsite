@@ -4,7 +4,7 @@ The source code for a personal wedding event website that I built. It's main fun
 
 ## Disclaimer
 
-The functionality meets my personal standards for effectiveness and reliability. I wouldn't recommend depending on it out-of-the-box to work the same way for you but, for what it's worth, it worked perfectly fine for our wedding.
+I wouldn't recommend depending on this out-of-the-box to work the same way for you but, for what it's worth, it worked perfectly fine for our wedding.
 
 Be aware that this is more of a toy project that is designed around a 1-time event. User accounts are easily accessible by anybody because passwords are encoded directly in the individual guest URLs. Don't use the guest application for anything that requires a secure and unique long-term user account.
 
